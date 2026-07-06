@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AlertTriangle } from "lucide-react";
+import { FeedbackButtons } from "@/components/feedback-buttons";
 import { ensureDatabase, prisma } from "@/lib/prisma";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 
@@ -61,9 +63,27 @@ export default async function PropertyDetailPage({ params }: { params: { id: str
                   </div>
                   <p className="mt-4 leading-7 text-zinc-200">{property.analysis.summary}</p>
                 </article>
+                <article className="rounded-lg border border-amber-300/20 bg-amber-300/10 p-6">
+                  <div className="flex items-center gap-2 text-amber-200">
+                    <AlertTriangle className="h-5 w-5" />
+                    <p className="text-sm">리스크 점수</p>
+                  </div>
+                  <div className="mt-2 flex items-end gap-3">
+                    <span className="text-5xl font-semibold">{property.analysis.riskScore}</span>
+                    <span className="pb-2 text-zinc-300">/ 100</span>
+                  </div>
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-black/30">
+                    <div
+                      className="h-full rounded-full bg-amber-300"
+                      style={{ width: `${property.analysis.riskScore}%` }}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm text-zinc-300">100에 가까울수록 투자 전 확인해야 할 리스크가 큽니다.</p>
+                </article>
                 <ReportCard title="시세 분석" body={property.analysis.marketAnalysis} />
                 <ReportCard title="투자 리포트" body={property.analysis.investmentReport} />
                 <ReportCard title="리스크 분석" body={property.analysis.riskAnalysis} />
+                <FeedbackButtons analysisId={property.analysis.id} />
               </>
             ) : (
               <div className="rounded-lg border border-white/10 bg-zinc-900 p-6 text-zinc-300">

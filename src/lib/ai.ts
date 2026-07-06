@@ -14,6 +14,7 @@ type PropertyInput = {
 
 type AnalysisResult = {
   score: number;
+  riskScore: number;
   summary: string;
   marketAnalysis: string;
   investmentReport: string;
@@ -35,7 +36,7 @@ export async function generatePropertyAnalysis(property: PropertyInput): Promise
         {
           role: "system",
           content:
-            "You are a Korean real estate investment analyst. Return only valid JSON with keys score, summary, marketAnalysis, investmentReport, riskAnalysis. score must be 0-100.",
+            "You are a Korean real estate investment analyst. Return only valid JSON with keys score, riskScore, summary, marketAnalysis, investmentReport, riskAnalysis. score and riskScore must be 0-100. score means investment attractiveness. riskScore means investment risk level where 100 is highest risk.",
         },
         {
           role: "user",
@@ -52,6 +53,7 @@ export async function generatePropertyAnalysis(property: PropertyInput): Promise
     const parsed = JSON.parse(content) as AnalysisResult;
     return {
       score: clampScore(parsed.score),
+      riskScore: clampScore(parsed.riskScore),
       summary: parsed.summary,
       marketAnalysis: parsed.marketAnalysis,
       investmentReport: parsed.investmentReport,
@@ -68,9 +70,11 @@ function createFallbackAnalysis(property: PropertyInput): AnalysisResult {
   const capRate = property.price > 0 ? (netAnnualRent / property.price) * 100 : 0;
   const age = new Date().getFullYear() - property.builtYear;
   const score = clampScore(Math.round(58 + capRate * 5 - Math.max(age - 15, 0) * 0.6));
+  const riskScore = clampScore(Math.round(42 - capRate * 3 + Math.max(age - 10, 0) * 1.2));
 
   return {
     score,
+    riskScore,
     summary: `${property.name}은 예상 순임대수익률 ${capRate.toFixed(
       2,
     )}% 수준의 ${property.type} 매물입니다. 입력 정보 기준으로 수익성과 입지 메모를 함께 검토할 필요가 있습니다.`,

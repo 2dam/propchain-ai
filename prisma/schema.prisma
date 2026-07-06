@@ -27,10 +27,20 @@ model Analysis {
   id               String   @id @default(cuid())
   propertyId       String   @unique
   score            Int
+  riskScore        Int      @default(50)
   summary          String
   marketAnalysis   String
   investmentReport String
   riskAnalysis     String
   createdAt        DateTime @default(now())
   property         Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feedback         Feedback[]
+}
+
+model Feedback {
+  id         String   @id @default(cuid())
+  analysisId String
+  value      String
+  createdAt  DateTime @default(now())
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 }
