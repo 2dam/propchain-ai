@@ -16,7 +16,7 @@
 
 ```bash
 npm install
-npx prisma migrate dev --name init
+npx prisma generate
 npm run dev
 ```
 
@@ -26,3 +26,5 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Copy `.env.example` to `.env` and set `OPENAI_API_KEY` to enable live AI analysis.
 If no key is provided, the app uses a deterministic fallback analysis so the MVP remains usable.
+
+The development SQLite tables are created automatically on first app use.
