@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
+import { DataCard } from "@/components/data-card";
 import { FeedbackButtons } from "@/components/feedback-buttons";
+import { MapPanel } from "@/components/map-panel";
+import { getMarketAndPublicData } from "@/lib/external-data";
 import { ensureDatabase, prisma } from "@/lib/prisma";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 
@@ -18,6 +21,8 @@ export default async function PropertyDetailPage({ params }: { params: { id: str
   if (!property) {
     notFound();
   }
+
+  const publicData = await getMarketAndPublicData(property);
 
   const metrics = [
     ["매매가", formatCurrency(property.price)],
@@ -49,6 +54,14 @@ export default async function PropertyDetailPage({ params }: { params: { id: str
             <div className="mt-6 rounded-md border border-white/10 p-4">
               <h2 className="font-semibold">주변/메모</h2>
               <p className="mt-2 leading-7 text-zinc-400">{property.neighborhood}</p>
+            </div>
+            <div className="mt-6 grid gap-3">
+              <a
+                href={`/properties/${property.id}/checkout`}
+                className="rounded-md bg-teal-400 px-4 py-3 text-center font-semibold text-zinc-950"
+              >
+                유료 PDF 리포트 받기
+              </a>
             </div>
           </section>
 
@@ -83,6 +96,25 @@ export default async function PropertyDetailPage({ params }: { params: { id: str
                 <ReportCard title="시세 분석" body={property.analysis.marketAnalysis} />
                 <ReportCard title="투자 리포트" body={property.analysis.investmentReport} />
                 <ReportCard title="리스크 분석" body={property.analysis.riskAnalysis} />
+                <MapPanel address={property.address} />
+                <DataCard
+                  title="실거래가 데이터"
+                  source={publicData.transactions.source}
+                  status={publicData.transactions.status}
+                  items={publicData.transactions.items}
+                />
+                <DataCard
+                  title="건축물대장 데이터"
+                  source={publicData.building.source}
+                  status={publicData.building.status}
+                  items={publicData.building.items}
+                />
+                <DataCard
+                  title="학군/교통 데이터"
+                  source={publicData.lifestyle.source}
+                  status={publicData.lifestyle.status}
+                  items={publicData.lifestyle.items}
+                />
                 <FeedbackButtons analysisId={property.analysis.id} />
               </>
             ) : (

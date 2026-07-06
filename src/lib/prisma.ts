@@ -77,5 +77,33 @@ export async function ensureDatabase() {
     CREATE UNIQUE INDEX IF NOT EXISTS "Analysis_propertyId_key" ON "Analysis"("propertyId");
   `);
 
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "User" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "email" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "passwordHash" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Payment" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "propertyId" TEXT NOT NULL,
+      "userId" TEXT,
+      "amount" INTEGER NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'PAID',
+      "provider" TEXT NOT NULL DEFAULT 'MVP',
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "Payment_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    );
+  `);
+
   isDatabaseReady = true;
 }

@@ -11,6 +11,8 @@
 - SQLite
 - OpenAI API
 - shadcn/ui 스타일의 다크 테마 컴포넌트
+- PDF 리포트 다운로드
+- 지도/공공데이터 연동 준비
 
 ## Getting Started
 
@@ -28,3 +30,13 @@ Copy `.env.example` to `.env` and set `OPENAI_API_KEY` to enable live AI analysi
 If no key is provided, the app uses a deterministic fallback analysis so the MVP remains usable.
 
 The development SQLite tables are created automatically on first app use.
+
+Optional public-data environment variables:
+
+```env
+PUBLIC_DATA_API_KEY=""
+REAL_ESTATE_API_URL=""
+BUILDING_REGISTER_API_URL=""
+```
+
+Without these keys, the app shows MVP fallback data for real transactions and building-register checks.

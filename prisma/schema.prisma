@@ -21,6 +21,7 @@ model Property {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   analysis       Analysis?
+  payments       Payment[]
 }
 
 model Analysis {
@@ -43,4 +44,25 @@ model Feedback {
   value      String
   createdAt  DateTime @default(now())
   analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  payments     Payment[]
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  propertyId String
+  userId     String?
+  amount     Int
+  status     String   @default("PAID")
+  provider   String   @default("MVP")
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
